@@ -2,6 +2,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { SigninDto, SignupDto } from './dto/auth.dto';
 import bcrypt from 'bcrypt';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './jwt.strategy';
 
 @Injectable()
 export class AuthService {
@@ -93,7 +95,7 @@ export class AuthService {
 
     return { message: 'Login successful!', data };
   }
-
+  // Logout
   logout(res: Response) {
     res.clearCookie('Authentication', {
       // TODO: On after frontend is developed
@@ -103,5 +105,30 @@ export class AuthService {
       sameSite: 'none',
     });
     return { message: 'Logged out successfully!' };
+  }
+
+  // Session - valid token?
+  async session(token: string) {
+    let userId: string;
+
+    try {
+      const payload: JwtPayload = await this.jwtService.verifyAsync(token);
+      userId = payload.sub;
+    } catch (err: unknown) {
+      Logger.error(err);
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+    const user = await this.prisma.user.findUnique({
+      where: { user_id: userId },
+      include: { shops: true },
+    });
+
+    if (!user) throw new UnauthorizedException('Session invalid');
+
+    return {
+      userId: user.user_id,
+      username: user.user_name,
+      shops: user.shops,
+    };
   }
 }
