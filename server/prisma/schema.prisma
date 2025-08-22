@@ -20,6 +20,7 @@ model User {
   password   String 
   shops      Shop[]
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("users")
 }
@@ -29,8 +30,9 @@ model Shop {
   shop_name String @unique
   user_id   String
 
-  user      User   @relation(fields: [user_id], references: [user_id])
+  user      User   @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Cascade)
 
+  
   // add user_id as Index
   @@index([user_id])
   @@map("shops")
