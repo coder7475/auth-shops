@@ -78,7 +78,9 @@ export class AuthService {
 
     const payload = { sub: user.user_id, username: user.user_name };
 
-    const token = await this.jwtService.signAsync(payload);
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: rememberMe ? '7d' : '30m',
+    });
 
     res.cookie('Authentication', token, {
       httpOnly: true,
