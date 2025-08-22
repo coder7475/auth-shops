@@ -39,8 +39,7 @@ export class AuthController {
   @Get('session')
   async session(@Req() req: Request) {
     const token = req?.cookies?.Authentication as string | undefined;
-    console.log(req.cookies);
-    console.log(token);
+
     if (typeof token !== 'string') {
       throw new Error('Invalid authentication token');
     }
