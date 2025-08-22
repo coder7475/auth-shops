@@ -4,6 +4,21 @@ import { Logger } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
+/**
+ * Bootstraps and starts the NestJS application with environment-driven configuration and a strict CORS policy.
+ *
+ * Reads and validates CORS_DOMAIN (required), PORT (defaults to 3000), and PROTOCOL from environment variables.
+ * Creates the app, applies cookie parsing middleware and a custom CORS handler that:
+ * - allows requests with no Origin (e.g., curl or native apps),
+ * - escapes special characters in the configured CORS domain,
+ * - permits the exact domain and its direct subdomains (matching scheme when PROTOCOL is provided),
+ * - rejects other origins and logs a warning.
+ *
+ * On successful initialization the server listens on the resolved port and logs the running URL.
+ * On startup failure the function logs the error and terminates the process with exit code 1.
+ *
+ * @returns A promise that resolves when the application has started (or never resolves if the process exits on failure).
+ */
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
