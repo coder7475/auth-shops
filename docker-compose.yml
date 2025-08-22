@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: auth-shops-postgres
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
+      POSTGRES_DB: auth_shops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - auth-shops-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: auth-shops-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - auth-shops-network
+
+  # Uncomment if you want to run the server in Docker during development
+  # server:
+  #   build:
+  #     context: ./server
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   container_name: auth-shops-server
+  #   ports:
+  #     - "3001:3001"
+  #   volumes:
+  #     - ./server:/app
+  #     - /app/node_modules
+  #   environment:
+  #     - NODE_ENV=development
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   networks:
+  #     - auth-shops-network
+
+  # Uncomment if you want to run the client in Docker during development
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   container_name: auth-shops-client
+  #   ports:
+  #     - "5173:5173"
+  #   volumes:
+  #     - ./client:/app
+  #     - /app/node_modules
+  #   environment:
+  #     - NODE_ENV=development
+  #   networks:
+  #     - auth-shops-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  auth-shops-network:
+    driver: bridge
