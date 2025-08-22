@@ -5,7 +5,7 @@ A full-stack authentication and shopping system built with modern technologies.
 ## Architecture
 
 - **Client**: Vite + React + TypeScript (deployed on Cloudflare Pages)
-- **Server**: NestJS + TypeORM + TypeScript (deployed on Vercel)
+- **Server**: NestJS + Prisma + TypeScript (deployed on Vercel)
 - **Package Manager**: pnpm workspaces
 
 ## Project Structure

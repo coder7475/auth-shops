@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -13,17 +13,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./server/database/init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: unless-stopped
-    networks:
-      - auth-shops-network
-
-  redis:
-    image: redis:7-alpine
-    container_name: auth-shops-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
     restart: unless-stopped
     networks:
       - auth-shops-network
@@ -67,7 +56,6 @@ services:
 
 volumes:
   postgres_data:
-  redis_data:
 
 networks:
   auth-shops-network:
