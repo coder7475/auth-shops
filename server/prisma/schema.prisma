@@ -1,0 +1,21 @@
+model User {
+  user_id    String   @id @default(uuid())
+  user_name  String   @unique
+  password   String 
+  shops      Shop[]
+  createdAt  DateTime @default(now())
+
+  @@map("users")
+}
+
+model Shop {
+  shop_id   String @id @default(uuid())
+  shop_name String @unique
+  user_id   String
+
+  user      User   @relation(fields: [user_id], references: [user_id])
+
+  // add user_id as Index
+  @@index([user_id])
+  @@map("shops")
+}
