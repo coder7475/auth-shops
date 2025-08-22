@@ -72,6 +72,9 @@ importers:
       '@nestjs/platform-express':
         specifier: ^11.0.1
         version: 11.1.6(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)
+      '@prisma/client':
+        specifier: 6.14.0
+        version: 6.14.0(prisma@6.14.0(typescript@5.8.3))(typescript@5.8.3)
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -1257,6 +1260,18 @@ packages:
 
   '@poppinss/exception@1.2.2':
     resolution: {integrity: sha512-m7bpKCD4QMlFCjA/nKTs23fuvoVFoA83brRKmObCUNmi/9tVu8Ve3w4YQAnJu4q3Tjf5fr685HYIC/IA2zHRSg==}
+
+  '@prisma/client@6.14.0':
+    resolution: {integrity: sha512-8E/Nk3eL5g7RQIg/LUj1ICyDmhD053STjxrPxUtCRybs2s/2sOEcx9NpITuAOPn07HEpWBfhAVe1T/HYWXUPOw==}
+    engines: {node: '>=18.18'}
+    peerDependencies:
+      prisma: '*'
+      typescript: '>=5.1.0'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+      typescript:
+        optional: true
 
   '@prisma/config@6.14.0':
     resolution: {integrity: sha512-IwC7o5KNNGhmblLs23swnfBjADkacBb7wvyDXUWLwuvUQciKJZqyecU0jw0d7JRkswrj+XTL8fdr0y2/VerKQQ==}
@@ -5139,6 +5154,11 @@ snapshots:
       supports-color: 10.2.0
 
   '@poppinss/exception@1.2.2': {}
+
+  '@prisma/client@6.14.0(prisma@6.14.0(typescript@5.8.3))(typescript@5.8.3)':
+    optionalDependencies:
+      prisma: 6.14.0(typescript@5.8.3)
+      typescript: 5.8.3
 
   '@prisma/config@6.14.0':
     dependencies:
