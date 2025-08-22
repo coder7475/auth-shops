@@ -11,6 +11,7 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const corsDomain = process.env.CORS_DOMAIN;
     const port = process.env.PORT ?? 3000;
+    const protocol = process.env.PROTOCOL;
 
     if (!corsDomain) {
       throw new Error('CORS_DOMAIN environment variable is required');
@@ -33,9 +34,12 @@ async function bootstrap() {
           );
 
           // Allow exact domain and its direct subdomains only
+          // use http for localhost - switch to https for production
           const allowedPatterns = [
-            new RegExp(`^https?://${escapedDomain}$`), // exact domain
-            new RegExp(`^https?://[a-z0-9][a-z0-9-]*\\.${escapedDomain}$`), // direct subdomains
+            new RegExp(`^${protocol}}?://${escapedDomain}$`), // exact domain
+            new RegExp(
+              `^${protocol}?://[a-z0-9][a-z0-9-]*\\.${escapedDomain}$`,
+            ), // direct subdomains
           ];
 
           const isAllowed = allowedPatterns.some((pattern) =>
@@ -55,7 +59,7 @@ async function bootstrap() {
     );
 
     await app.listen(port);
-    logger.log(`Application is running on: http://localhost:${port}`);
+    logger.log(`Application is running on: ${protocol}://localhost:${port}`);
   } catch (error) {
     logger.error('Failed to start application', error);
     process.exit(1);
