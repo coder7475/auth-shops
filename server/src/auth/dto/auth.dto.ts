@@ -10,7 +10,7 @@ import {
 
 export class SignupDto {
   @IsString()
-  username: string;
+  user_name: string;
 
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
@@ -29,7 +29,7 @@ export class SignupDto {
 
 export class SigninDto {
   @IsString()
-  username: string;
+  user_name: string;
 
   @IsString()
   password: string;
