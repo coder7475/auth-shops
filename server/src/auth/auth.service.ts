@@ -60,7 +60,7 @@ export class AuthService {
       throw err;
     }
   }
-
+  // Login
   async signin(dto: SigninDto, res: Response) {
     const { user_name, password, rememberMe } = dto;
 
@@ -92,5 +92,16 @@ export class AuthService {
     };
 
     return { message: 'Login successful!', data };
+  }
+
+  logout(res: Response) {
+    res.clearCookie('Authentication', {
+      // TODO: On after frontend is developed
+      //   domain: process.env.COOKIE_DOMAIN,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+    return { message: 'Logged out successfully!' };
   }
 }
