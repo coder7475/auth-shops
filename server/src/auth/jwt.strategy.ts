@@ -7,7 +7,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import type { Request } from 'express';
 
-interface JwtPayload {
+export interface JwtPayload {
   sub: string;
   username: string;
 }

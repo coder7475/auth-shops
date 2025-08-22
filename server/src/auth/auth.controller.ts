@@ -1,7 +1,16 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SigninDto, SignupDto } from './dto/auth.dto';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
+import { JwtAuthGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -23,5 +32,19 @@ export class AuthController {
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
     return this.authService.logout(res);
+  }
+
+  // Session - valid token?
+  @UseGuards(JwtAuthGuard)
+  @Get('session')
+  async session(@Req() req: Request) {
+    const token = req?.cookies?.Authentication as string | undefined;
+    console.log(req.cookies);
+    console.log(token);
+    if (typeof token !== 'string') {
+      throw new Error('Invalid authentication token');
+    }
+
+    return this.authService.session(token);
   }
 }
