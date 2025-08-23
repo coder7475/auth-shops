@@ -41,18 +41,19 @@ export function LoginForm({
     try {
       // Pass rememberMe to backend or as option for session duration
       const payload = {
-        username: data.username,
+        user_name: data.username,
         password: data.password,
         rememberMe: data.rememberMe,
       };
+      console.log(payload);
       const res = await login(payload).unwrap();
-
+      console.log(res);
       if (res.success) {
         toast.success("Login Successfully!");
         // Redirect to dashboard after successful login
         navigate("/dashboard");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Show proper error messages
       if (typeof err === "object" && err !== null && "status" in err) {
         const status = (err as { status?: number }).status;
@@ -184,7 +185,7 @@ export function LoginForm({
               type="submit"
               variant="default"
               size="lg"
-              className="group w-full"
+              className="group w-full cursor-pointer"
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? "Signing in..." : "Sign In"}

@@ -80,7 +80,6 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({
       where: { user_name },
-      include: { shops: true },
     });
 
     if (!user) throw new NotFoundException('User not found!');
@@ -98,13 +97,14 @@ export class AuthService {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      // * TODO: Must be available after frontend is finished
-      //   domain: process.env.COOKIE_DOMAIN,
+      // Turn it on for production
+      // domain: process.env.COOKIE_DOMAIN,
       maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000,
     });
 
     const data = {
-      userName: user.user_name,
+      user_name: user.user_name,
+      createdAt: user.createdAt,
     };
 
     return { success: true, message: 'Login successful!', data };
@@ -140,8 +140,8 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Session invalid');
 
     return {
-      userId: user.user_id,
-      username: user.user_name,
+      user_id: user.user_id,
+      user_name: user.user_name,
       shops: user.shops,
     };
   }
