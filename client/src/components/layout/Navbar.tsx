@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Car } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { Link } from "react-router";
 
 import { ModeToggle } from "../mode-toggler";
@@ -15,10 +15,10 @@ const Navbar = () => {
             className="flex items-center space-x-2 text-xl font-bold"
           >
             <div className="bg-gradient-primary flex h-8 w-8 items-center justify-center rounded-lg">
-              <Car className="text-primary h-5 w-5" />
+              <ShoppingBag className="text-primary h-5 w-5" />
             </div>
             <span className="from-primary to-accent bg-gradient-to-r bg-clip-text">
-              RideBook
+              AuthShops
             </span>
           </Link>
 

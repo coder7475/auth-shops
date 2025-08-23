@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const { data, isLoading } = useUserInfoQuery(undefined);
-  console.log(data);
+  // console.log(data);
   const navigate = useNavigate();
 
   useEffect(() => {
