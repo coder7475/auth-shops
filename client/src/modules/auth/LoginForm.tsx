@@ -45,9 +45,9 @@ export function LoginForm({
         password: data.password,
         rememberMe: data.rememberMe,
       };
-      console.log(payload);
+      // console.log(payload);
       const res = await login(payload).unwrap();
-      console.log(res);
+      // console.log(res);
       if (res.success) {
         toast.success("Login Successfully!");
         // Redirect to dashboard after successful login
@@ -55,13 +55,23 @@ export function LoginForm({
       }
     } catch (err: unknown) {
       // Show proper error messages
-      if (typeof err === "object" && err !== null && "status" in err) {
+
+      // Handle error shape: { status: 404, data: { message: "User not found!", ... } }
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "status" in err &&
+        "data" in err &&
+        typeof (err as any).data === "object" &&
+        (err as any).data !== null
+      ) {
         const status = (err as { status?: number }).status;
-        if (status === 400) {
-          // Incorrect password
+        const data = (err as { data?: any }).data;
+        const message = data?.message;
+
+        if (status === 401 && message === "Incorrect password!") {
           form.setError("password", { message: "Incorrect password" });
-        } else if (status === 404) {
-          // User not found
+        } else if (status === 404 && message === "User not found!") {
           form.setError("username", { message: "User not found" });
         } else {
           toast.error("Login failed. Please try again.");
