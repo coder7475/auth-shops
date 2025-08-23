@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -10,62 +9,50 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Password from "@/components/ui/password";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useRegisterMutation } from "@/redux/features/auth/auth.api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Car, Lock, Mail, Phone, User } from "lucide-react";
+import { ArrowRight, Lock, ShoppingBasket, User } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 
+// Zod schema for signup form
 const registerSchema = z
   .object({
-    firstName: z
+    user_name: z
       .string()
-      .min(2, {
-        message: "First name must be at least 2 characters",
-      })
-      .max(50),
-    lastName: z
-      .string()
-      .min(2, {
-        message: "Last name must be at least 2 characters",
-      })
-      .max(50),
-    email: z.string().email(),
-    phone: z
-      .string()
-      .min(10, { message: "Phone number must be at least 10 digits" })
-      .max(15, { message: "Phone number is too long" }),
+      .min(2, { message: "Username must be at least 2 characters" })
+      .max(50, { message: "Username must be at most 50 characters" }),
+    shopNames: z.string().refine(
+      (val) => {
+        // Split, trim, filter empty, deduplicate, count
+        const arr = val
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s, i, a) => s && a.indexOf(s) === i);
+
+        return arr.length >= 3;
+      },
+      {
+        message:
+          "Please enter at least 3 unique shop names, separated by commas.",
+      }
+    ),
     password: z
       .string()
-      .min(8, { message: "Password is too short" })
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
-      })
+      .min(8, { message: "Password must be at least 8 characters" })
+      .regex(/\d/, { message: "Password must contain at least one number" })
       .regex(/[^A-Za-z0-9]/, {
         message: "Password must contain at least one special character",
       }),
     confirmPassword: z
       .string()
       .min(8, { message: "Confirm Password is too short" }),
-    userType: z.enum(["rider", "driver"]).refine((val) => !!val, {
-      message: "Please select whether you want to be a rider or driver",
-    }),
-    terms: z.boolean().refine((val) => val === true, {
-      message: "You must accept the terms and conditions",
-    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Password do not match",
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
@@ -79,41 +66,53 @@ export function RegisterForm({
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      userType: "rider",
+      user_name: "",
+      shopNames: "",
       password: "",
       confirmPassword: "",
-      terms: false,
     },
   });
 
   const {
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = form;
 
   const onSubmit = async (data: z.infer<typeof registerSchema>) => {
+    // Prepare shopNames as array of unique, trimmed names
+    const shopNamesArr = data.shopNames
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s, i, a) => s && a.indexOf(s) === i);
+
     const userInfo = {
-      name: `${data.firstName} ${data.lastName}`,
-      email: data.email,
-      phone: data.phone,
-      userType: data.userType,
+      user_name: data.user_name,
       password: data.password,
+      shopNames: shopNamesArr,
     };
 
     try {
       const result = await register(userInfo).unwrap();
 
       if (result.success) {
-        toast.success("User created successfully");
-        navigate("/verify", { state: data.email });
+        toast.success("Signed Up!");
+
+        navigate("/login");
+      } else if (result.error?.shopNames) {
+        toast.warning(result.error.shopNames);
       }
-    } catch (error) {
-      console.error(error);
-      toast.warning("User Creation failed or user already exits");
-      navigate("/login");
+    } catch (error: unknown) {
+      // Handle backend errors for username and shop name uniqueness
+      const apiError = error as {
+        data?: { message?: string; statusCode?: number };
+      };
+      if (
+        apiError?.data?.message === "Username Unavailable!" &&
+        apiError?.data?.statusCode === 400
+      ) {
+        toast.warning("Username Unavailable!");
+      } else {
+        toast.warning("User creation failed or user already exists");
+      }
     }
   };
 
@@ -121,9 +120,9 @@ export function RegisterForm({
     <div className={cn("flex flex-col", className)} {...props}>
       <div className="mb-8 flex flex-col items-center gap-2 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500">
-          <Car className="h-8 w-8 text-white" />
+          <ShoppingBasket className="h-8 w-8 text-white" />
         </div>
-        <h1 className="text-2xl font-bold">Join RideBook</h1>
+        <h1 className="text-2xl font-bold">Join AuthShops</h1>
         <p className="text-muted-foreground text-sm">
           Create your account to get started
         </p>
@@ -132,58 +131,20 @@ export function RegisterForm({
       <div className="grid gap-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                        <Input
-                          placeholder="First name"
-                          className="pl-10"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Last name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Email Field */}
+            {/* Username Field */}
             <FormField
               control={form.control}
-              name="email"
+              name="user_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Address</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                      <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                       <Input
-                        placeholder="john.doe@company.com"
-                        type="email"
+                        placeholder="Username"
                         className="pl-10"
+                        autoComplete="username"
                         {...field}
                       />
                     </div>
@@ -193,21 +154,26 @@ export function RegisterForm({
               )}
             />
 
-            {/* Phone Field */}
+            {/* Shop Names Field */}
             <FormField
               control={form.control}
-              name="phone"
+              name="shopNames"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>Shop Names</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <div>
                       <Input
-                        placeholder="Enter your phone number"
-                        className="pl-10"
-                        {...field}
+                        type="text"
+                        placeholder="Enter shop names separated by commas"
+                        value={field.value}
+                        onChange={field.onChange}
+                        autoComplete="off"
                       />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Please enter at least <b>3 unique shop names</b>,
+                        separated by commas.
+                      </p>
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -215,41 +181,7 @@ export function RegisterForm({
               )}
             />
 
-            {/* User Type Select */}
-            <FormField
-              control={form.control}
-              name="userType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>I want to</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose your role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="rider">
-                        <div className="flex items-center">
-                          <User className="mr-2 h-4 w-4" />
-                          Be a Rider - Book rides
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="driver">
-                        <div className="flex items-center">
-                          <Car className="mr-2 h-4 w-4" />
-                          Be a Driver - Earn money driving
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Password Fields */}
+            {/* Password Field */}
             <FormField
               control={form.control}
               name="password"
@@ -259,7 +191,11 @@ export function RegisterForm({
                   <FormControl>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                      <Password className="pl-10" {...field} />
+                      <Password
+                        className="pl-10"
+                        autoComplete="new-password"
+                        {...field}
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -267,6 +203,7 @@ export function RegisterForm({
               )}
             />
 
+            {/* Confirm Password Field */}
             <FormField
               control={form.control}
               name="confirmPassword"
@@ -276,51 +213,13 @@ export function RegisterForm({
                   <FormControl>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                      <Password className="pl-10" {...field} />
+                      <Password
+                        className="pl-10"
+                        autoComplete="new-password"
+                        {...field}
+                      />
                     </div>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Terms and Conditions Checkbox */}
-            <FormField
-              control={form.control}
-              name="terms"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-start space-x-2">
-                    <FormControl>
-                      <Checkbox
-                        id="terms"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className={errors.terms ? "border-red-500" : ""}
-                      />
-                    </FormControl>
-                    <div className="grid gap-1.5 leading-none">
-                      <FormLabel
-                        htmlFor="terms"
-                        className="cursor-pointer text-sm leading-relaxed"
-                      >
-                        I agree to the{" "}
-                        <Link
-                          to="/terms"
-                          className="text-sky-400 underline underline-offset-4 hover:font-medium"
-                        >
-                          Terms and Conditions
-                        </Link>{" "}
-                        and{" "}
-                        <Link
-                          to="/privacy"
-                          className="text-sky-400 underline underline-offset-4 hover:font-medium"
-                        >
-                          Privacy Policy
-                        </Link>
-                      </FormLabel>
-                    </div>
-                  </div>
                   <FormMessage />
                 </FormItem>
               )}
