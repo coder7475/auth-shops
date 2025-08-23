@@ -8,6 +8,7 @@ import { LogOut, UserCircle } from "lucide-react";
 import type { IShop } from "@/types/shop.types";
 import { useAppDispatch } from "@/redux/hook";
 import { Link, useNavigate } from "react-router";
+import { getShopName } from "@/utils/getShopNames";
 
 export default function DashboardLayout() {
   const { data, isLoading } = useUserInfoQuery(undefined);
@@ -19,6 +20,7 @@ export default function DashboardLayout() {
   const userName = data?.user_name || "User";
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const shop = getShopName();
 
   const handleLogout = async () => {
     await logout(undefined);
@@ -40,8 +42,8 @@ export default function DashboardLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="flex items-center justify-between px-6 py-4 border-b bg-white shadow-sm">
+    <div className="min-h-screen flex flex-col">
+      <header className="flex items-center justify-between px-6 py-4 border-b  shadow-sm">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <div className="relative">
           <button
@@ -91,7 +93,9 @@ export default function DashboardLayout() {
           )}
         </div>
       </header>
-      <main className="flex-1 p-8">{/* Dashboard content goes here */}</main>
+      <main className="flex-1 p-8">
+        <h1 className="text-xl font-bold text-primary">This is {shop} shop</h1>
+      </main>
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded shadow-lg p-6 w-80">
