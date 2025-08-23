@@ -2,6 +2,11 @@
 
 A full-stack authentication and shopping system built with modern web technologies, featuring multi-tenant architecture with subdomain-based shop management.
 
+## 🌐 Live Demo
+
+- **Backend API**: [authshopsbackend.vercel.app](https://authshopsbackend.vercel.app)
+- **Frontend**: [shops.robiulhossain.com](https://shops.robiulhossain.com)
+
 ## 🏗️ Architecture Overview
 
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Radix UI
