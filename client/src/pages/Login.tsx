@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { LoginForm } from "@/modules/auth/LoginForm";
 import { Separator } from "@radix-ui/react-separator";
-import { Car } from "lucide-react";
+import { ShoppingBagIcon } from "lucide-react";
 import { Link } from "react-router";
 
 export default function Login() {
@@ -13,11 +13,11 @@ export default function Login() {
             {/* Header */}
             <div className="flex w-full flex-col items-center rounded-lg text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500">
-                <Car className="h-8 w-8 text-white" />
+                <ShoppingBagIcon className="h-8 w-8 text-white" />
               </div>
               <h1 className="mb-2 text-2xl font-bold">Welcome Back</h1>
               <p className="text-muted-foreground">
-                Sign in to your RideBook account
+                Sign in to your AuthShops account
               </p>
             </div>
 
