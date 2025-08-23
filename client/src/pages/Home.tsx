@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
 import { Link, useNavigate } from "react-router";
-import { ModeToggle } from "@/components/mode-toggler";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {

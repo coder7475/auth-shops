@@ -1,4 +1,4 @@
-export type { ISendOtp, IVerifyOtp, ILogin } from "./auth.types";
+export type { ILogin } from "./auth.types";
 
 export interface IResponse<T> {
   statusCode: number;
@@ -6,4 +6,3 @@ export interface IResponse<T> {
   message: string;
   data: T;
 }
-
