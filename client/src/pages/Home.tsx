@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const { data, isLoading } = useUserInfoQuery(undefined);
-
+  console.log(data);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (data?.data?.email) {
+    if (data?.user_name) {
       navigate("/dashboard");
     }
-  }, [data?.data?.email, navigate]);
+  }, [data?.user_name, navigate]);
 
   if (isLoading) {
     return (
