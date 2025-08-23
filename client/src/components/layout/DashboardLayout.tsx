@@ -1,22 +1,34 @@
 import { useState } from "react";
-import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
+import {
+  authApi,
+  useLogoutMutation,
+  useUserInfoQuery,
+} from "@/redux/features/auth/auth.api";
 import { LogOut, UserCircle } from "lucide-react";
 import type { IShop } from "@/types/shop.types";
+import { useAppDispatch } from "@/redux/hook";
+import { useNavigate } from "react-router";
 
 export default function DashboardLayout() {
   const { data, isLoading } = useUserInfoQuery(undefined);
-
+  const [logout] = useLogoutMutation();
   // State for menu and logout confirmation dialog
   const [showMenu, setShowMenu] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const userName = data?.user_name || "User";
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Replace with your logout logic
-    console.log("Logout Logic");
+  const handleLogout = async () => {
+    await logout(undefined);
+
     setShowLogoutConfirm(false);
     setShowMenu(false);
+
+    dispatch(authApi.util.resetApiState());
+
+    navigate("/");
   };
 
   if (isLoading) {
@@ -85,13 +97,13 @@ export default function DashboardLayout() {
             </p>
             <div className="flex justify-end gap-2">
               <button
-                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-gray-700"
+                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer"
                 onClick={() => setShowLogoutConfirm(false)}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white"
+                className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white cursor-pointer"
                 onClick={handleLogout}
               >
                 Logout
