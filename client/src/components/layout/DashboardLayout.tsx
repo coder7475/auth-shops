@@ -1,28 +1,105 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { Separator } from "@/components/ui/separator"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Outlet } from "react-router"
+import { useState } from "react";
+import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
+import { LogOut, UserCircle } from "lucide-react";
+import type { IShop } from "@/types/shop.types";
 
 export default function DashboardLayout() {
+  const { data, isLoading } = useUserInfoQuery(undefined);
+
+  // State for menu and logout confirmation dialog
+  const [showMenu, setShowMenu] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const userName = data?.user_name || "User";
+
+  const handleLogout = () => {
+    // Replace with your logout logic
+    console.log("Logout Logic");
+    setShowLogoutConfirm(false);
+    setShowMenu(false);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary border-solid"></div>
+      </div>
+    );
+  }
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <Outlet />
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="flex items-center justify-between px-6 py-4 border-b bg-white shadow-sm">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div className="relative">
+          <button
+            className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition"
+            onClick={() => setShowMenu((v) => !v)}
+            aria-label="Profile menu"
+          >
+            <UserCircle className="w-8 h-8 text-gray-600" />
+            <span className="hidden sm:inline text-gray-700">{userName}</span>
+          </button>
+          {showMenu && (
+            <div className="absolute right-0 mt-2 w-56 bg-white border rounded shadow-lg z-10">
+              <div className="px-4 py-2 border-b font-semibold text-gray-700">
+                Your Shops
+              </div>
+              <ul className="max-h-48 overflow-y-auto">
+                {data?.shops && data.shops.length > 0 ? (
+                  data.shops.map((shop: IShop, idx: number) => (
+                    <li
+                      key={shop.shop_id || idx}
+                      className="px-4 py-2 hover:bg-gray-100 text-gray-800"
+                    >
+                      {shop.shop_name}
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-2 text-gray-400 italic">
+                    No shops registered
+                  </li>
+                )}
+              </ul>
+              <button
+                className="flex items-center gap-2 w-full px-4 py-2 text-red-600 hover:bg-red-50 border-t"
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowLogoutConfirm(true);
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
-      </SidebarInset>
-    </SidebarProvider>
-  )
+      </header>
+      <main className="flex-1 p-8">{/* Dashboard content goes here */}</main>
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded shadow-lg p-6 w-80">
+            <h2 className="text-lg font-semibold mb-2">Confirm Logout</h2>
+            <p className="mb-4 text-gray-600">
+              Are you sure you want to log out?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-gray-700"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
