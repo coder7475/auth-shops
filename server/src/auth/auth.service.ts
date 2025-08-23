@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   BadRequestException,
   Injectable,
@@ -12,6 +11,8 @@ import bcrypt from 'bcrypt';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt.strategy';
+import { IResponse } from 'src/common/interfaces/response.interface';
+import { IUser } from './interface/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   // signUp - Register
-  async signup(dto: SignupDto) {
+  async signup(dto: SignupDto): Promise<IResponse<IUser>> {
     const { user_name, password, shopNames } = dto;
 
     if (!user_name) {
@@ -48,8 +49,19 @@ export class AuthService {
         },
         include: { shops: true },
       });
+      const { user_id, shops, createdAt } = user;
+      const data = {
+        user_id,
+        user_name,
+        shops,
+        createdAt,
+      };
 
-      return user;
+      return {
+        success: true,
+        message: 'User created Successfully.',
+        data,
+      };
     } catch (err: unknown) {
       if (
         err &&
