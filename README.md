@@ -89,7 +89,7 @@ auth-shops/
 
    # Or start individually:
    pnpm client:dev    # Frontend on http://localhost:5173
-   pnpm server:dev     # Backend on http://localhost:3001
+   pnpm server:dev     # Backend on http://localhost:3000
    ```
 
 ## 🛠️ Development Commands
@@ -114,8 +114,14 @@ pnpm clean            # Clean node_modules
 ```
 
 ### Client-Specific Commands
-
 ```bash
+# From root directory using filters
+pnpm client:dev       # Start Vite dev server
+pnpm client:build     # Build for production  
+pnpm client:preview   # Preview production build
+pnpm client:deploy    # Deploy to Cloudflare Pages
+
+# Or from client directory
 cd client
 pnpm dev              # Start Vite dev server
 pnpm build            # Build for production
@@ -158,29 +164,6 @@ model Shop {
 
 ## 🌐 Environment Variables
 
-### Root `.env`
-
-```bash
-# Database
-DATABASE_TYPE=postgres
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_USERNAME=auth_user
-DATABASE_PASSWORD=auth_password
-DATABASE_NAME=auth_shops
-
-# Authentication
-JWT_SECRET=your_jwt_secret_key_here
-JWT_EXPIRES_IN=7d
-REFRESH_TOKEN_SECRET=your_refresh_token_secret_here
-REFRESH_TOKEN_EXPIRES_IN=30d
-
-# API Configuration
-API_PORT=3001
-API_URL=http://localhost:3001
-VITE_API_URL=http://localhost:3001
-```
-
 ### Client `.env`
 
 ```bash
@@ -201,7 +184,7 @@ VITE_PROTOCOL="http"
 
 - **Automatic**: Deploys on push to main branch
 - **Config**: `server/vercel.json`
-- **Database**: Use Neon, Supabase, or similar PostgreSQL service
+- **Database**: Use Prisma+Postgres Cloud
 
 ## 🔧 Technology Stack
 
