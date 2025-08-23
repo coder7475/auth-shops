@@ -24,29 +24,18 @@ async function bootstrap() {
     app.use(
       cors({
         origin: (origin, callback) => {
-          // Allow requests with no origin (mobile apps, curl, etc.)
           if (!origin) return callback(null, true);
 
-          // Escape special regex characters and create exact domain match
+          // Allow exact domain and any subdomain
           const escapedDomain = corsDomain.replace(
             /[.*+?^${}()|[\]\\]/g,
             '\\$&',
           );
-
-          // Allow exact domain and its direct subdomains only
-          // use http for localhost - switch to https for production
-          const allowedPatterns = [
-            new RegExp(`^${protocol}}?://${escapedDomain}$`), // exact domain
-            new RegExp(
-              `^${protocol}?://[a-z0-9][a-z0-9-]*\\.${escapedDomain}$`,
-            ), // direct subdomains
-          ];
-
-          const isAllowed = allowedPatterns.some((pattern) =>
-            pattern.test(origin),
+          const pattern = new RegExp(
+            `^${protocol}://([a-z0-9-]+\\.)*${escapedDomain}$`,
           );
 
-          if (isAllowed) {
+          if (pattern.test(origin)) {
             callback(null, true);
           } else {
             logger.warn(`CORS blocked origin: ${origin}`);
@@ -54,7 +43,7 @@ async function bootstrap() {
           }
         },
         credentials: true,
-        optionsSuccessStatus: 200, // For legacy browser support
+        optionsSuccessStatus: 200,
       }),
     );
 

@@ -26,3 +26,8 @@ dist-ssr
 # wrangler files
 .wrangler
 .dev.vars*
+
+# Vite environment files
+.env
+.env.*
+# End of Selection
