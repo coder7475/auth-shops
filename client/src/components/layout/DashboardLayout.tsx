@@ -62,7 +62,7 @@ export default function DashboardLayout() {
                   data.shops.map((shop: IShop, idx: number) => (
                     <Link
                       key={shop.shop_id || idx}
-                      to={`http://${shop.shop_name}.${import.meta.env.VITE_SHOP_DOMAIN}`}
+                      to={`${import.meta.env.VITE_PROTOCOL}://${shop.shop_name}.${import.meta.env.VITE_SHOP_DOMAIN}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

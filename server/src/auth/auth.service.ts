@@ -98,7 +98,7 @@ export class AuthService {
       secure: true,
       sameSite: 'none',
       // Turn it on for production
-      domain: process.env.COOKIE_DOMAIN,
+      // domain: 'shops.robiulhossain.com',
       maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000,
     });
 
@@ -112,7 +112,7 @@ export class AuthService {
   // Logout
   logout(res: Response) {
     res.clearCookie('Authentication', {
-      domain: process.env.COOKIE_DOMAIN,
+      // domain: process.env.COOKIE_DOMAIN,
       httpOnly: true,
       secure: true,
       sameSite: 'none',

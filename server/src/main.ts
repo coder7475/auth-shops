@@ -26,13 +26,16 @@ async function bootstrap() {
         origin: (origin, callback) => {
           if (!origin) return callback(null, true);
 
-          // Allow exact domain and any subdomain
+          // Allow exact domain and any subdomain of corsDomain
+          // e.g. corsDomain = "example.com" allows "example.com" and "*.example.com"
           const escapedDomain = corsDomain.replace(
             /[.*+?^${}()|[\]\\]/g,
             '\\$&',
           );
+          // Match protocol://example.com or protocol://*.example.com
           const pattern = new RegExp(
             `^${protocol}://([a-z0-9-]+\\.)*${escapedDomain}$`,
+            'i',
           );
 
           if (pattern.test(origin)) {
