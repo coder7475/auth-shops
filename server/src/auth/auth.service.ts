@@ -107,7 +107,7 @@ export class AuthService {
       userName: user.user_name,
     };
 
-    return { message: 'Login successful!', data };
+    return { success: true, message: 'Login successful!', data };
   }
   // Logout
   logout(res: Response) {
@@ -118,7 +118,7 @@ export class AuthService {
       secure: true,
       sameSite: 'none',
     });
-    return { message: 'Logged out successfully!' };
+    return { success: true, message: 'Logged out successfully!', data: null };
   }
 
   // Session - valid token?
