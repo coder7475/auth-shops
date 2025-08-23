@@ -9,6 +9,7 @@ import type { IShop } from "@/types/shop.types";
 import { useAppDispatch } from "@/redux/hook";
 import { Link, useNavigate } from "react-router";
 import { getShopName } from "@/utils/getShopNames";
+import { ModeToggle } from "../mode-toggler";
 
 export default function DashboardLayout() {
   const { data, isLoading } = useUserInfoQuery(undefined);
@@ -45,6 +46,7 @@ export default function DashboardLayout() {
     <div className="min-h-screen flex flex-col">
       <header className="flex items-center justify-between px-6 py-4 border-b  shadow-sm">
         <h1 className="text-2xl font-bold">Dashboard</h1>
+        <ModeToggle />
         <div className="relative">
           <button
             className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition"
@@ -54,6 +56,7 @@ export default function DashboardLayout() {
             <UserCircle className="w-8 h-8 text-gray-600" />
             <span className="hidden sm:inline text-gray-700">{userName}</span>
           </button>
+
           {showMenu && (
             <div className="absolute right-0 mt-2 w-56 bg-white border rounded shadow-lg z-10">
               <div className="px-4 py-2 border-b font-semibold text-gray-700">
@@ -80,7 +83,7 @@ export default function DashboardLayout() {
                 )}
               </ul>
               <button
-                className="flex items-center gap-2 w-full px-4 py-2 text-red-600 hover:bg-red-50 border-t"
+                className="flex items-center gap-2 w-full px-4 py-2 text-red-600 hover:bg-red-50 border-t cursor-pointer"
                 onClick={() => {
                   setShowMenu(false);
                   setShowLogoutConfirm(true);

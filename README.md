@@ -1,78 +1,261 @@
 # Auth Shops Monorepo
 
-A full-stack authentication and shopping system built with modern technologies.
+A full-stack authentication and shopping system built with modern web technologies, featuring multi-tenant architecture with subdomain-based shop management.
 
-## Architecture
+## 🏗️ Architecture Overview
 
-- **Client**: Vite + React + TypeScript (deployed on Cloudflare Pages)
-- **Server**: NestJS + Prisma + TypeScript (deployed on Vercel)
-- **Package Manager**: pnpm workspaces
+- **Frontend**: React + TypeScript + Vite + Tailwind CSS + Radix UI
+- **Backend**: NestJS + Prisma + PostgreSQL + JWT Authentication
+- **Deployment**: Cloudflare Pages (frontend) + Vercel (backend)
+- **Database**: PostgreSQL with Prisma ORM
+- **Package Management**: pnpm workspaces
 
-## Project Structure
+## 📁 Project Structure
 
-```
+```bash
 auth-shops/
-├── client/                 # Frontend application
-│   ├── src/               # React source code
-│   ├── package.json       # Client dependencies
-│   └── vite.config.ts     # Vite configuration
-├── server/                # Backend application
-│   ├── src/               # NestJS source code
-│   ├── package.json       # Server dependencies
-│   └── vercel.json        # Vercel deployment config
-├── docker-compose.yml     # Docker services
-├── package.json           # Root workspace configuration
-└── README.md              # This file
+├── client/                    # Frontend React application
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── pages/            # Application pages/routes
+│   │   ├── hooks/            # Custom React hooks
+│   │   ├── lib/              # Utilities (axios, utils)
+│   │   └── config/           # App configuration
+│   ├── package.json          # Frontend dependencies
+│   ├── vite.config.ts        # Vite build configuration
+│   └── wrangler.jsonc        # Cloudflare Workers config
+├── server/                    # Backend NestJS application
+│   ├── src/
+│   │   ├── auth/             # Authentication module
+│   │   ├── database/         # Prisma service & module
+│   │   └── main.ts           # Application entry point
+│   ├── prisma/
+│   │   └── schema.prisma     # Database schema
+│   ├── package.json          # Backend dependencies
+│   └── vercel.json           # Vercel deployment config
+├── docker-compose.yml         # Local PostgreSQL setup
+├── pnpm-workspace.yaml       # pnpm workspace configuration
+└── package.json              # Root workspace scripts
 ```
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js >= 18.0.0
-- pnpm >= 8.0.0
+- **Node.js** >= 18.0.0
+- **pnpm** >= 8.0.0 (recommended package manager)
+- **PostgreSQL** (local or remote)
 
-### Installation
+### Installation & Setup
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd auth-shops
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Environment Configuration**
+
+   ```bash
+   # Client level
+   cp client/.env.example client/.env.development
+
+   # Server level
+   cp server/.env.example server/.env
+   ```
+
+4. **Database Setup**
+
+   ```bash
+   # Start local PostgreSQL with Docker
+   docker-compose up postgres -d
+
+   # Run Prisma migrations
+   cd server && pnpm dlx prisma migrate dev
+   ```
+
+5. **Start Development Servers**
+
+   ```bash
+   # Start both client and server
+   pnpm dev
+
+   # Or start individually:
+   pnpm client:dev    # Frontend on http://localhost:5173
+   pnpm server:dev     # Backend on http://localhost:3001
+   ```
+
+## 🛠️ Development Commands
+
+### Root Level Commands
 
 ```bash
-# Install all dependencies
-pnpm install
+# Development
+pnpm dev              # Start both client & server
+pnpm client:dev       # Start frontend only
+pnpm server:dev       # Start backend only
 
-# Start development servers
-pnpm dev
+# Building
+pnpm build            # Build all packages
+pnpm client:build     # Build frontend only
+pnpm server:build     # Build backend only
+
+# Quality Assurance
+pnpm lint             # Lint all packages
+pnpm test             # Run all tests
+pnpm clean            # Clean node_modules
 ```
 
-### Development
+### Client-Specific Commands
 
 ```bash
-# Start both client and server
-pnpm dev
-
-# Start only client
-pnpm client:dev
-
-# Start only server
-pnpm server:dev
-
-# Build all packages
-pnpm build
-
-# Run tests
-pnpm test
-
-# Lint all packages
-pnpm lint
+cd client
+pnpm dev              # Start Vite dev server
+pnpm build            # Build for production
+pnpm preview          # Preview production build
+pnpm deploy           # Deploy to Cloudflare Pages
+pnpm lint             # ESLint check
 ```
 
-### Environment Variables
+### Server-Specific Commands
 
-Copy `.env.example` to `.env` and fill in your environment variables.
+```bash
+cd server
+pnpm dev              # Start NestJS in watch mode
+pnpm build            # Build for production
+pnpm start:prod       # Start production server
+pnpm lint             # ESLint check
+pnpm test             # Run Jest tests
+```
 
-## Deployment
+## 🗄️ Database Schema
 
-- **Client**: Automatically deployed to Cloudflare Pages on push to main
-- **Server**: Automatically deployed to Vercel on push to main
+The application uses PostgreSQL with the following core entities:
 
-## License
+```prisma
+model User {
+  user_id    String   @id @default(uuid())
+  user_name  String   @unique
+  password   String
+  shops      Shop[]
+  createdAt  DateTime @default(now())
+}
 
-MIT
+model Shop {
+  shop_id   String @id @default(uuid())
+  shop_name String @unique
+  user_id   String
+  user      User   @relation(fields: [user_id], references: [user_id])
+}
+```
+
+## 🌐 Environment Variables
+
+### Root `.env`
+
+```bash
+# Database
+DATABASE_TYPE=postgres
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=auth_user
+DATABASE_PASSWORD=auth_password
+DATABASE_NAME=auth_shops
+
+# Authentication
+JWT_SECRET=your_jwt_secret_key_here
+JWT_EXPIRES_IN=7d
+REFRESH_TOKEN_SECRET=your_refresh_token_secret_here
+REFRESH_TOKEN_EXPIRES_IN=30d
+
+# API Configuration
+API_PORT=3001
+API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:3001
+```
+
+### Client `.env`
+
+```bash
+VITE_BASE_URL="http://localhost:3000"
+VITE_SHOP_DOMAIN="localhost:5173"
+VITE_PROTOCOL="http"
+```
+
+## 🚀 Deployment
+
+### Frontend (Cloudflare Pages)
+
+- **Automatic**: Deploys on push to main branch
+- **Manual**: `cd client && pnpm deploy`
+- **Config**: `client/wrangler.jsonc`
+
+### Backend (Vercel)
+
+- **Automatic**: Deploys on push to main branch
+- **Config**: `server/vercel.json`
+- **Database**: Use Neon, Supabase, or similar PostgreSQL service
+
+## 🔧 Technology Stack
+
+### Frontend
+
+- **React 19** with TypeScript
+- **Vite** for fast development & building
+- **Tailwind CSS** for styling
+- **Radix UI** for accessible components
+- **Redux Toolkit** for state management
+- **React Router** for navigation
+- **Axios** for API calls
+- **React Hook Form** + **Zod** for form validation
+
+### Backend
+
+- **NestJS** framework with TypeScript
+- **Prisma ORM** with PostgreSQL
+- **JWT Authentication** with Passport
+- **Bcrypt** for password hashing
+- **Class Validator** for request validation
+- **CORS** configured for cross-origin requests
+
+### Development Tools
+
+- **ESLint** & **Prettier** for code quality
+- **Jest** for testing
+- **Docker Compose** for local PostgreSQL
+- **pnpm** workspaces for monorepo management
+
+## 🔐 Authentication Flow
+
+1. **Registration/Login**: User provides credentials
+2. **Token Generation**: Server issues JWT access & refresh tokens
+3. **Cookie Storage**: Refresh token stored in httpOnly cookie
+4. **API Requests**: Access token sent in Authorization header
+5. **Token Refresh**: Automatic refresh when access token expires
+6. **Logout**: Tokens cleared from client & server
+
+## 🏪 Multi-Tenant Architecture
+
+The system supports multiple shops per user with subdomain-based routing:
+
+- Main domain: `localhost:5173` (authentication & shop management)
+- Shop domains: `{shop-name}.localhost:5173` (shop-specific content)
+
+## 📝 License
+
+This project is private and not licensed for public use.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
