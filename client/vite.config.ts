@@ -1,6 +1,6 @@
-import { fileURLToPath, URL } from "node:url";
+import path from "path";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
@@ -10,15 +10,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), cloudflare()],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-    },
-  },
-  server: {
-    hmr: {
-      overlay: true,
-    },
-    watch: {
-      usePolling: true,
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });

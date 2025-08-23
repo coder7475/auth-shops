@@ -10,9 +10,7 @@
     /* Shadcn path config for IDE*/
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
 
     /* Bundler mode */
