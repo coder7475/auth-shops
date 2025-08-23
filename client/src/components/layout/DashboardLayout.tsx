@@ -7,7 +7,7 @@ import {
 import { LogOut, UserCircle } from "lucide-react";
 import type { IShop } from "@/types/shop.types";
 import { useAppDispatch } from "@/redux/hook";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 export default function DashboardLayout() {
   const { data, isLoading } = useUserInfoQuery(undefined);
@@ -60,12 +60,16 @@ export default function DashboardLayout() {
               <ul className="max-h-48 overflow-y-auto">
                 {data?.shops && data.shops.length > 0 ? (
                   data.shops.map((shop: IShop, idx: number) => (
-                    <li
+                    <Link
                       key={shop.shop_id || idx}
-                      className="px-4 py-2 hover:bg-gray-100 text-gray-800"
+                      to={`http://${shop.shop_name}.${import.meta.env.VITE_SHOP_DOMAIN}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      {shop.shop_name}
-                    </li>
+                      <li className="px-4 py-2 hover:bg-gray-100 text-gray-800">
+                        {shop.shop_name}
+                      </li>
+                    </Link>
                   ))
                 ) : (
                   <li className="px-4 py-2 text-gray-400 italic">
