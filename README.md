@@ -114,10 +114,11 @@ pnpm clean            # Clean node_modules
 ```
 
 ### Client-Specific Commands
+
 ```bash
 # From root directory using filters
 pnpm client:dev       # Start Vite dev server
-pnpm client:build     # Build for production  
+pnpm client:build     # Build for production
 pnpm client:preview   # Preview production build
 pnpm client:deploy    # Deploy to Cloudflare Pages
 
@@ -215,14 +216,28 @@ VITE_PROTOCOL="http"
 - **Docker Compose** for local PostgreSQL
 - **pnpm** workspaces for monorepo management
 
+# Authentication API Endpoints
+
+| Endpoint        | Method | Auth Required | Description                    | Request Body (JSON)                                                                          | Responses                                        |
+| --------------- | ------ | ------------- | ------------------------------ | -------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `/auth/signup`  | POST   | No            | Register a new user with shops | `{ "user_name": "string", "password": "string", "shopNames": ["string","string","string"] }` | `201 Created`, `400 Bad Request`, `409 Conflict` |
+| `/auth/signin`  | POST   | No            | Login and receive JWT cookie   | `{ "user_name": "string", "password": "string", "rememberMe": false }`                       | `200 OK`, `401 Unauthorized`, `404 Not Found`    |
+| `/auth/logout`  | POST   | Yes           | Clear JWT cookie (logout)      | None                                                                                         | `200 OK`                                         |
+| `/auth/session` | GET    | Yes           | Get current user session info  | None                                                                                         | `200 OK`                                         |
+
 ## 🔐 Authentication Flow
 
-1. **Registration/Login**: User provides credentials
-2. **Token Generation**: Server issues JWT access & refresh tokens
-3. **Cookie Storage**: Refresh token stored in httpOnly cookie
-4. **API Requests**: Access token sent in Authorization header
-5. **Token Refresh**: Automatic refresh when access token expires
-6. **Logout**: Tokens cleared from client & server
+1. **User Login**: User submits their username and password to login
+2. **Credential Validation**: Backend verifies credentials. If valid, it generates an **Authentication** token (user rememberMe check or uncheck to validity to 7 days and 30mins)
+3. **Set Token Cookie**: The token is set as an `HttpOnly` cookie with `SameSite=None` and `domain=.shops.example.com`, making it available across all subdomains.
+4. **Accessing Protected Routes**:
+   - The frontend sends API requests with in the header, or relies on the Authentication token cookie for server-side validation.
+   - The backend checks the authentication token to authorize requests.
+5. **Session Persistence Across Subdomains**:
+   - Because the refresh token cookie is set for `.shops.example.com`, users remain logged in when opening any subdomain in a new tab.
+6. **Logout Flow**:
+   - The backend clears the token cookie
+   - The frontend removes the token from local state and redirects the user to the login page.
 
 ## 🏪 Multi-Tenant Architecture
 
